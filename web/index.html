@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>我要呼吸新鮮空氣</title>
+        <meta charset="UTF-8">
+        <style>
+            /* Always set the map height explicitly to define the size of the div
+             * element that contains the map. */
+            #map {
+                height: 100%;
+            }
+            /* Optional: Makes the sample page fill the window. */
+            html, body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <script type='text/javascript' src='http://code.jquery.com/jquery-1.9.1.min.js'></script>
+        <script type="text/javascript"
+                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBdi1mwh6DrvMQ3nYoWYpMoRn5C38VWfb0&libraries=visualization">
+        </script>
+        <div id="map"></div>
+        <script>
+            var heatmapData = [];
+            $.ajax({
+                url: "https://pm25.lass-net.org/data/last-all-airbox.json",
+                type: "GET",
+                dataType: "json",
+                success: function (Jdata) {
+                    for (var i = 0; i < Jdata.feeds.length; i++) {
+                        var latLng = new google.maps.LatLng(Jdata.feeds[i].gps_lat, Jdata.feeds[i].gps_lon);
+                        var weightedLoc = {
+                            location: latLng,
+                            weight: Jdata.feeds[i].s_d0
+                        };
+                        heatmapData.push(weightedLoc);
+                    }
+                    var heatmap = new google.maps.visualization.HeatmapLayer({
+                        data: heatmapData,
+                        radius: 100, //每點半徑
+                        opacity: 1//,
+                        //gradient: ['transparent', '#f00', '#0f0', '#00f']
+                    });
+                    heatmap.setMap(map);
+                },
+                error: function () {
+                    alert("ERROR!!!");
+                }
+            });
+            $.ajax({
+                url: "./factory.json",
+                type: "GET",
+                dataType: "json",
+                success: function (Jdata) {
+                    
+        /*
+                    for (var i = 0; i < Jdata.feeds.length; i++) {
+                        var latLng = new google.maps.LatLng(Jdata.feeds[i].gps_lat, Jdata.feeds[i].gps_lon);
+                        var weightedLoc = {
+                            location: latLng,
+                            weight: Jdata.feeds[i].s_d0
+                        };
+                        heatmapData.push(weightedLoc);
+                    }
+                    var heatmap = new google.maps.visualization.HeatmapLayer({
+                        data: heatmapData,
+                        radius: 100, //每點半徑
+                        opacity:
+                    });
+                    heatmap.setMap(map);
+                    */
+                   //alert(Jdata.length);
+                },
+                error: function () {
+                    alert("ERROR!!!");
+                }
+            });
+            var chiayi = new google.maps.LatLng(23.485723, 120.441236);
+            var map = new google.maps.Map(document.getElementById('map'), {
+                center: chiayi,
+                zoom: 16,
+                mapTypeId: 'satellite'
+            });
+
+        </script>
+    </body>
+</html>
